@@ -227,13 +227,13 @@ const ChatWindow = () => {
           onClick={() => setLeftSidebarOpen(!leftSidebarOpen)}
           className="absolute top-4 left-4 z-10"
         >
-          <MessageSquare className="h-4 w-4" />
+          <MessageSquare className="h-5 w-5" />
         </Button>
         <Button
           onClick={() => setRightSidebarOpen(!rightSidebarOpen)}
           className="absolute top-4 right-4 z-10"
         >
-          <Settings className="h-4 w-4" />
+          <Settings className="h-5 w-5" />
         </Button>
       </div>
     </div>

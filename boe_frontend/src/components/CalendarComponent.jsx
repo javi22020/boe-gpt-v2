@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState } from "react"
+import LoadingSpinner from "./LoadingSpinner"
 import { Calendar } from "@/components/ui/calendar"
 import { Button } from "@/components/ui/button"
 import { format } from "date-fns"
@@ -32,7 +33,7 @@ export default function Component() {
   }
 
   function disableDates(date) {
-    return date > new Date() || date < new Date("2000-01-01")
+    return date > new Date() || date < new Date("2000-01-01") || date.getDay() === 0
   }
 
   return (
@@ -42,11 +43,11 @@ export default function Component() {
         selected={date}
         onSelect={handleDateSelect}
         disabled={disableDates}
-        className="rounded-md border"
+        showOutsideDays={false}
       />
-      <Button onClick={handleSubmit} disabled={!date || loading}>
+      {loading ? <LoadingSpinner /> : <Button onClick={handleSubmit} disabled={!date}>
         Enviar a Chroma
-      </Button>
+      </Button>}
     </div>
   )
 }
