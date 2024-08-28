@@ -34,4 +34,4 @@ RUN mkdir model
 
 EXPOSE 5550:5550
 
-CMD ["sh", "-c", "ulimit -l unlimited && python3 server.py"]
+CMD ["sh", "-c", "ulimit -l unlimited && . venv/bin/activate && python3 server.py"]

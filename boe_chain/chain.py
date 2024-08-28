@@ -5,6 +5,7 @@ from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.prompts.prompt import PromptTemplate
 from langchain_chroma.vectorstores import Chroma
 from langchain_openai.embeddings.base import OpenAIEmbeddings
+from langchain_core.runnables.history import RunnableWithMessageHistory
 from chromadb import HttpClient
 class BOEGPTChain:
     def __init__(self, model: str) -> None:
@@ -24,9 +25,12 @@ class BOEGPTChain:
             llm=self.llm,
             prompt=self.prompt_docs
         )
-        self.chain = create_retrieval_chain(
+        self.retrieval_chain = create_retrieval_chain(
             retriever=self.chroma.as_retriever(),
             combine_docs_chain=self.doc_chain
+        )
+        self.chain = RunnableWithMessageHistory(
+            self.retrieval_chain
         )
     
     def query(self, query: str) -> str:
