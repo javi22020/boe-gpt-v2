@@ -1,5 +1,5 @@
 from chromadb.api.types import Embeddings, Documents
-import os, openai
+import os, openai, uvicorn
 from tqdm import tqdm
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
@@ -57,3 +57,6 @@ async def send_to_chroma(date: str):
     embeds = embeddings(docs_contents)
     collection.add(ids=docs_names, embeddings=embeds)
     return {"message": "Success"}
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=6550)
