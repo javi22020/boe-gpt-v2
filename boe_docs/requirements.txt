@@ -1,0 +1,9 @@
+tqdm
+requests
+pydantic
+fastapi
+uvicorn[standard]
+pdfminer.six
+langchain-community
+langchain-text-splitters
+chromadb

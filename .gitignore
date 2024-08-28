@@ -1,0 +1,9 @@
+model/
+venv/
+__pycache__/
+*.pyc
+node_modules/
+.idea/
+.vscode/
+.next/
+*.gguf

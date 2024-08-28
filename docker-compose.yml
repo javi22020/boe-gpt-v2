@@ -1,0 +1,100 @@
+name: boe-gpt
+
+services:
+  chroma:
+    image: chromadb/chroma
+    networks:
+      - red
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+  
+  embed:
+    build: ./boe_embed
+    networks:
+      - red
+    ports:
+      - "5550:5550"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5550/heartbeat"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+  
+  docs:
+    build: ./boe_docs
+    networks:
+      - red
+    ports:
+      - "6550:6550"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6550/heartbeat"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      embed:
+        condition: service_healthy
+      chroma:
+        condition: service_healthy
+  
+  llm:
+    build: ./boe_llm
+    networks:
+      - red
+    ports:
+      - "4550:4550"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4550/heartbeat"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+  
+  chain:
+    build: ./boe_chain
+    networks:
+      - red
+    ports:
+      - "3550:3550"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3550/heartbeat"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      docs:
+        condition: service_healthy
+      llm:
+        condition: service_healthy
+  
+  frontend:
+    build: ./boe_frontend
+    networks:
+      - red
+    ports:
+      - "3000:3000"
+    depends_on:
+      chain:
+        condition: service_healthy
+
+networks:
+  red:
+    driver: bridge

@@ -1,0 +1,12 @@
+[
+    {
+        "id": 1,
+        "title": "Primera conversación",
+        "messages": [
+            {
+                "role": "assistant",
+                "content": "Escribe un mensaje para comenzar la conversación"
+            }
+        ]
+    }
+]
