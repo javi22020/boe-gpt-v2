@@ -1,4 +1,4 @@
-import uvicorn
+import uvicorn, os
 from llama_cpp.server.app import create_app
 from llama_cpp.server.settings import ModelSettings, ServerSettings
 app = create_app(
@@ -8,8 +8,8 @@ app = create_app(
     ),
     model_settings=[
         ModelSettings(
-            model="model/nomic-embed-text-v1.5.Q4_K_M.gguf",
-            model_alias="nomic-embed-text-v1.5",
+            model="model/" + os.listdir("model")[0],
+            model_alias="default-embed",
             n_gpu_layers=-1
         )
     ]

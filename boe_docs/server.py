@@ -20,7 +20,7 @@ class LocalEmbeddings(EmbeddingFunction):
             api_key="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"
         )
     def __call__(self, input: Documents) -> Embeddings:
-        return self.embed.embeddings.create(input, model="nomic-embed-text-v1.5").data[0].embedding
+        return self.embed.embeddings.create(input, model="default-embed").data[0].embedding
 
 embeddings = LocalEmbeddings()
 

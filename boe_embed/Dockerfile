@@ -32,8 +32,6 @@ RUN . venv/bin/activate && \
 
 RUN mkdir model
 
-RUN wget 'https://huggingface.co/nomic-ai/nomic-embed-text-v1.5-GGUF/resolve/main/nomic-embed-text-v1.5.Q4_K_M.gguf' -O 'model/nomic-embed-text-v1.5.Q4_K_M.gguf'
-
 EXPOSE 5550:5550
 
 CMD sudo sh -c 'ulimit -l unlimited && . venv/bin/activate && python3 server.py'

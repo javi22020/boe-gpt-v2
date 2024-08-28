@@ -32,8 +32,6 @@ RUN . venv/bin/activate && \
 
 RUN mkdir model
 
-RUN wget 'https://huggingface.co/bartowski/Phi-3.5-mini-instruct-GGUF/resolve/main/Phi-3.5-mini-instruct-Q4_K_M.gguf' -O 'model/Phi-3.5-mini-instruct-Q4_K_M.gguf'
-
 EXPOSE 4550:4550
 
 CMD sudo sh -c 'ulimit -l unlimited && . venv/bin/activate && python3 server.py'

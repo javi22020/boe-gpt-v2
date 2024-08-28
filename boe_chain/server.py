@@ -16,7 +16,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-chain = BOEGPTChain("phi-3.5-mini-instruct")
+chain = BOEGPTChain("default")
 
 @app.post("/chat")
 def chat(query: str = Body(..., embed=True)):
