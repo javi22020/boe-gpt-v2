@@ -10,7 +10,8 @@ app = create_app(
         ModelSettings(
             model="model/" + os.listdir("model")[0],
             model_alias="default-embed",
-            n_gpu_layers=-1
+            n_gpu_layers=-1,
+            embedding=True
         )
     ]
 )
