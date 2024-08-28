@@ -3,7 +3,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
-const CalendarComponent = () => {
+const CalendarComponent = ({ onDaySelect }) => {
   const [selectedDay, setSelectedDay] = useState(null);
   const [addedDays, setAddedDays] = useState([]);
 
@@ -37,6 +37,9 @@ const CalendarComponent = () => {
 
   const handleDaySelect = (day) => {
     setSelectedDay(day);
+    if (onDaySelect) {
+      onDaySelect(day.toISOString().split('T')[0]);
+    }
   };
 
   const handleSendToChroma = async () => {
@@ -48,13 +51,11 @@ const CalendarComponent = () => {
       if (response.ok) {
         setAddedDays(prev => [...prev, selectedDay.toISOString().split('T')[0]]);
         setSelectedDay(null); // Clear selection after successful addition
-        alert('Día enviado a Chroma exitosamente');
       } else {
-        alert('Error al enviar el día a Chroma');
+        console.error('Error al enviar el día a Chroma');
       }
     } catch (error) {
       console.error('Error sending day to Chroma:', error);
-      alert('Error al enviar el día a Chroma');
     }
   };
 
@@ -65,29 +66,49 @@ const CalendarComponent = () => {
   };
 
   return (
-    <div className="mb-4">
+    <div className="w-full">
       <h3 className="text-lg font-semibold mb-2">Calendario</h3>
-      <Calendar
-        mode="single"
-        selected={selectedDay}
-        onSelect={handleDaySelect}
-        disabled={(date) => !isDateSelectable(date)}
-        modifiers={{
-          today: (date) => {
-            const today = new Date();
-            return date.getDate() === today.getDate() &&
-                   date.getMonth() === today.getMonth() &&
-                   date.getFullYear() === today.getFullYear();
-          }
-        }}
-        modifiersStyles={{
-          today: {
-            fontWeight: 'bold',
-            border: '1px solid currentColor'
-          }
-        }}
-        className="rounded-md border mb-4"
-      />
+      <div className="overflow-hidden">
+        <Calendar
+          mode="single"
+          selected={selectedDay}
+          onSelect={handleDaySelect}
+          disabled={(date) => !isDateSelectable(date)}
+          modifiers={{
+            today: (date) => {
+              const today = new Date();
+              return date.getDate() === today.getDate() &&
+                     date.getMonth() === today.getMonth() &&
+                     date.getFullYear() === today.getFullYear();
+            }
+          }}
+          modifiersStyles={{
+            today: {
+              fontWeight: 'bold',
+              border: '1px solid currentColor'
+            }
+          }}
+          className="rounded-md border mb-4 w-full"
+          classNames={{
+            months: "w-full",
+            month: "w-full",
+            table: "w-full",
+            head_row: "flex w-full",
+            head_cell: "text-muted-foreground rounded-md w-8 font-normal text-[0.8rem] flex-1",
+            row: "flex w-full mt-2",
+            cell: "text-center text-sm p-0 relative [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20 flex-1",
+            day: "h-8 w-8 p-0 font-normal aria-selected:opacity-100 mx-auto",
+            day_range_start: "day-range-start",
+            day_range_end: "day-range-end",
+            day_selected: 
+              "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
+            day_today: "bg-accent text-accent-foreground",
+            day_outside: "text-muted-foreground opacity-50",
+            day_disabled: "text-muted-foreground opacity-50",
+            day_hidden: "invisible",
+          }}
+        />
+      </div>
       <Button 
         onClick={handleSendToChroma} 
         disabled={!selectedDay}

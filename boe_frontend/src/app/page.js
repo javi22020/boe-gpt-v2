@@ -61,8 +61,8 @@ const ChatWindow = () => {
   const handleDaySelect = async (day) => {
     const formattedDay = day.replace(/-/g, '');
     try {
-      await fetch(`http://docs:6550/send_to_chroma/${formattedDay}`);
-      setSelectedDays([...selectedDays, day]);
+      await fetch(`http://docs:6550/send_to_chroma/${formattedDay}`, { method: 'POST' });
+      setSelectedDays(prevDays => [...prevDays, day]);
     } catch (error) {
       console.error('Error sending day to Chroma:', error);
     }
@@ -209,16 +209,18 @@ const ChatWindow = () => {
             </div>
           </div>
           <div className="mb-4">
-            <h3 className="text-lg font-semibold mb-2">Selected Days</h3>
-            <div className="flex flex-wrap gap-2">
-              {selectedDays.map((day) => (
-                <span key={day} className="bg-blue-500 text-white px-2 py-1 rounded-full text-sm">
-                  {day}
-                </span>
-              ))}
+              <h3 className="text-lg font-semibold mb-2">Selected Days</h3>
+              <div className="flex flex-wrap gap-2">
+                {selectedDays.map((day) => (
+                  <span key={day} className="bg-blue-500 text-white px-2 py-1 rounded-full text-sm">
+                    {day}
+                  </span>
+                ))}
+              </div>
             </div>
-          </div>
-          <CalendarComponent/>
+            <div className="mt-4">
+              <CalendarComponent onDaySelect={handleDaySelect} />
+            </div>
         </Sidebar>
 
         {/* Toggle buttons for sidebars */}
