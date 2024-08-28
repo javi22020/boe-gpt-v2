@@ -1,8 +1,13 @@
 FROM node:current-alpine
 
+WORKDIR /app
+
 COPY . /app
 
-WORKDIR /app
+ENV NODE_ENV production
+
+RUN npm cache clean --force && \
+    rm -rf node_modules .next
 
 RUN npm install
 
