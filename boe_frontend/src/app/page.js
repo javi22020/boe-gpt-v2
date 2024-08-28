@@ -209,7 +209,6 @@ const ChatWindow = () => {
             </div>
           </div>
           <div className="mb-4">
-              <h3 className="text-lg font-semibold mb-2">Selected Days</h3>
               <div className="flex flex-wrap gap-2">
                 {selectedDays.map((day) => (
                   <span key={day} className="bg-blue-500 text-white px-2 py-1 rounded-full text-sm">
