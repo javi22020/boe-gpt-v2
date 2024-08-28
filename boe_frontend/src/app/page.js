@@ -1,13 +1,14 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { Sun, Moon, Settings, MessageSquare } from 'lucide-react';
+import { Sun, Moon, Settings, MessageSquare, ChevronDown } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Sidebar } from '@/components/ui/sidebar';
 import { Card } from '@/components/ui/card';
 import WelcomePage from '@/app/WelcomePage';
 import { ThemeProvider, useTheme } from '@/context/theme';
-
+import { AnimatePresence, motion } from 'framer-motion';
+import CalendarComponent from '@/components/CalendarComponent';
 const ChatWindow = () => {
   const { darkMode, toggleDarkMode } = useTheme(true);
   const [streamingMode, setStreamingMode] = useState(true);
@@ -17,14 +18,18 @@ const ChatWindow = () => {
   const [rightSidebarOpen, setRightSidebarOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
+  const [models, setModels] = useState([]);
+  const [selectedModel, setSelectedModel] = useState(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {
     fetchConversations();
+    fetchModels();
   }, []);
 
   const fetchConversations = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:3550/conversations');
+      const response = await fetch('http://chain:3550/conversations');
       const data = await response.json();
       setConversations(data);
     } catch (error) {
@@ -32,10 +37,31 @@ const ChatWindow = () => {
     }
   };
 
+  const fetchModels = async () => {
+    try {
+      const response = await fetch('http://llm:4550/models');
+      const data = await response.json();
+      setModels(data.models);
+      setSelectedModel(data.models[0]);
+    } catch (error) {
+      console.error('Error fetching models:', error);
+    }
+  };
+
+  const handleModelChange = async (modelIndex) => {
+    try {
+      await fetch(`http://llm:4550/set_model/${modelIndex}`, { method: 'POST' });
+      setSelectedModel(models[modelIndex]);
+      setIsDropdownOpen(false);
+    } catch (error) {
+      console.error('Error changing model:', error);
+    }
+  };
+
   const handleDaySelect = async (day) => {
     const formattedDay = day.replace(/-/g, '');
     try {
-      await fetch(`http://127.0.0.1:6550/send_to_chroma/${formattedDay}`);
+      await fetch(`http://docs:6550/send_to_chroma/${formattedDay}`);
       setSelectedDays([...selectedDays, day]);
     } catch (error) {
       console.error('Error sending day to Chroma:', error);
@@ -49,7 +75,7 @@ const ChatWindow = () => {
     setMessages([...messages, newMessage]);
     setInputMessage('');
 
-    const endpoint = streamingMode ? 'http://127.0.0.1:3550/chat_stream' : 'http://127.0.0.1:3550/chat';
+    const endpoint = streamingMode ? 'http://chain:3550/chat_stream' : 'http://chain:3550/chat';
 
     try {
       const response = await fetch(endpoint, {
@@ -89,10 +115,10 @@ const ChatWindow = () => {
       <div className="flex-1 flex bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-200">
         {/* Left Sidebar */}
         <Sidebar position="left" open={leftSidebarOpen} onClose={() => setLeftSidebarOpen(false)}>
-          <h2 className="text-xl font-bold mb-4">Conversations</h2>
+          <h2 className="text-xl font-bold mb-4">Conversaciones</h2>
           {conversations.map((conv) => (
             <Card key={conv.id} className="p-2 mb-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800">
-              {conv.messages[0].content.substring(0, 50)}...
+              {`Conversación ${conv.id}`}...
             </Card>
           ))}
         </Sidebar>
@@ -124,18 +150,18 @@ const ChatWindow = () => {
                 onChange={(e) => setInputMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
                 className="flex-1 p-2 border rounded-l-lg dark:bg-gray-800 dark:border-gray-700"
-                placeholder="Type your message..."
+                placeholder="Escribe tu mensaje..."
               />
-              <Button onClick={handleSendMessage} className="rounded-r-lg">Send</Button>
+              <Button onClick={handleSendMessage} className="rounded-r-lg">Enviar</Button>
             </div>
           </div>
         </div>
 
         {/* Right Sidebar */}
         <Sidebar position="right" open={rightSidebarOpen} onClose={() => setRightSidebarOpen(false)}>
-          <h2 className="text-xl font-bold mb-4">Settings</h2>
+          <h2 className="text-xl font-bold mb-4">Ajustes</h2>
           <div className="flex items-center justify-between mb-4">
-            <span>Dark Mode</span>
+            <span>Modo Oscuro</span>
             <Switch
               checked={darkMode}
               onCheckedChange={toggleDarkMode}
@@ -143,11 +169,44 @@ const ChatWindow = () => {
             />
           </div>
           <div className="flex items-center justify-between mb-4">
-            <span>Streaming Mode</span>
+            <span>Streaming</span>
             <Switch
               checked={streamingMode}
               onCheckedChange={setStreamingMode}
             />
+          </div>
+          <div className="mb-4">
+            <h3 className="text-lg font-semibold mb-2">Modelo de Lenguaje</h3>
+            <div className="relative">
+              <Button
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className="w-full justify-between"
+              >
+                {selectedModel || "Selecciona un modelo"}
+                <ChevronDown className={`ml-2 h-4 w-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+              </Button>
+              <AnimatePresence>
+                {isDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-md shadow-lg"
+                  >
+                    {models.map((model, index) => (
+                      <div
+                        key={index}
+                        className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                        onClick={() => handleModelChange(index)}
+                      >
+                        {model}
+                      </div>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
           <div className="mb-4">
             <h3 className="text-lg font-semibold mb-2">Selected Days</h3>
@@ -159,7 +218,7 @@ const ChatWindow = () => {
               ))}
             </div>
           </div>
-          {/* Aquí iría el componente Calendar, que no está incluido en este ejemplo */}
+          <CalendarComponent/>
         </Sidebar>
 
         {/* Toggle buttons for sidebars */}

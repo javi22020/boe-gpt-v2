@@ -109,11 +109,11 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: "./boe_llm/model"
+      device: "./models/llm"
   
   modelo-embed:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: "./boe_embed/model"
+      device: "./models/embed"
