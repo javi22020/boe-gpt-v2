@@ -17,13 +17,13 @@ class BOEGPTChain:
     def __init__(self, model: str) -> None:
         api_key="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"
         self.llm = ChatOpenAI(
-            # base_url="http://llm:4550",
+            # base_url="http://127.0.0.1:4550",
             model=model,
             api_key=api_key,
             streaming=True
         )
         self.prompt_docs = PromptTemplate.from_template(open("prompt_docs.md", "r", encoding="utf-8").read())
-        self.chroma = Chroma(client=HttpClient(host="chroma", port=8000), collection_name="docs", embedding_function=OpenAIEmbeddings(model="text-embedding-3-small",api_key=api_key))
+        self.chroma = Chroma(client=HttpClient(host="127.0.0.1", port=8000), collection_name="docs", embedding_function=OpenAIEmbeddings(model="text-embedding-3-small",api_key=api_key))
         self.chroma._LANGCHAIN_DEFAULT_COLLECTION_NAME = "docs"
         self.doc_chain = create_stuff_documents_chain(
             llm=self.llm,

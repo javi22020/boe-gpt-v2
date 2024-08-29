@@ -35,7 +35,7 @@ const ChatWindow = () => {
 
   const fetchConversations = async () => {
     try {
-      const response = await fetch('http://chain:3550/conversations');
+      const response = await fetch('http://127.0.0.1:3550/conversations');
       const data = await response.json();
       setConversations(data);
     } catch (error) {
@@ -45,7 +45,7 @@ const ChatWindow = () => {
 
   const fetchModels = async () => {
     try {
-      const response = await fetch('http://llm:4550/downloaded_models');
+      const response = await fetch('http://127.0.0.1:4550/downloaded_models');
       const data = await response.json();
       setModels(data.models);
     } catch (error) {
@@ -55,7 +55,7 @@ const ChatWindow = () => {
 
   const fetchCurrentModelIndex = async () => {
     try {
-      const response = await fetch('http://llm:4550/selected_model');
+      const response = await fetch('http://127.0.0.1:4550/selected_model');
       const data = await response.json();
       setSelectedModelIndex(data.model_index);
       setSelectedModel(models[data.model_index]);
@@ -66,7 +66,7 @@ const ChatWindow = () => {
 
   const handleModelChange = async (modelIndex) => {
     try {
-      await fetch(`http://llm:4550/set_model/${modelIndex}`, { method: 'POST' });
+      await fetch(`http://127.0.0.1:4550/set_model/${modelIndex}`, { method: 'POST' });
       setSelectedModelIndex(modelIndex);
       setSelectedModel(models[modelIndex]);
       setIsDropdownOpen(false);
@@ -78,7 +78,7 @@ const ChatWindow = () => {
   const handleDaySelect = async (day) => {
     const formattedDay = day.replace(/-/g, '');
     try {
-      await fetch(`http://docs:6550/send_to_chroma/${formattedDay}`, { method: 'POST' });
+      await fetch(`http://127.0.0.1:6550/send_to_chroma/${formattedDay}`, { method: 'POST' });
       setSelectedDays(prevDays => [...prevDays, day]);
     } catch (error) {
       console.error('Error sending day to Chroma:', error);
@@ -88,14 +88,14 @@ const ChatWindow = () => {
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
 
-    const newMessage = { role: 'user', content: inputMessage };
-    setMessages([...messages, newMessage]);
+    const newUserMessage = { role: 'user', content: inputMessage };
+    setMessages(prevMessages => [...prevMessages, newUserMessage]);
     setInputMessage('');
 
     const encodedQuery = encodeURIComponent(inputMessage);
     const endpoint = streamingMode 
-      ? `http://chain:3550/chat_stream/${encodedQuery}` 
-      : `http://chain:3550/chat/${encodedQuery}`;
+      ? `http://127.0.0.1:3550/chat_stream/${encodedQuery}` 
+      : `http://127.0.0.1:3550/chat/${encodedQuery}`;
 
     try {
       const response = await fetch(endpoint, {
@@ -106,6 +106,7 @@ const ChatWindow = () => {
       if (streamingMode) {
         const reader = response.body.getReader();
         let assistantMessage = { role: 'assistant', content: '' };
+        setMessages(prevMessages => [...prevMessages, assistantMessage]);
 
         while (true) {
           const { done, value } = await reader.read();
@@ -115,16 +116,22 @@ const ChatWindow = () => {
           for (const line of lines) {
             if (line.startsWith('data: ')) {
               assistantMessage.content += line.slice(6).replace(/\n/g, '\\n') + ' ';
-              setMessages(prevMessages => [...prevMessages.slice(0, -1), { ...assistantMessage }]);
+              setMessages(prevMessages => [
+                ...prevMessages.slice(0, -1),
+                { ...assistantMessage }
+              ]);
             }
           }
         }
       } else {
         const data = await response.json();
-        setMessages(prevMessages => [...prevMessages, { 
-          role: 'assistant', 
-          content: data.answer ? data.answer.replace(/\n/g, '\\n') : 'No answer received'
-        }]);
+        setMessages(prevMessages => [
+          ...prevMessages,
+          { 
+            role: 'assistant', 
+            content: data.answer ? data.answer.replace(/\n/g, '\\n') : 'No answer received'
+          }
+        ]);
       }
     } catch (error) {
       console.error('Error sending message:', error);
