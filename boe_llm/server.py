@@ -41,7 +41,7 @@ def get_models():
 
 @app.get("/model")
 def get_model():
-    return {"model": config["model"]}
+    return {"model_index": config["model"]}
 
 @app.post("/set_model/{i}")
 def set_model(i: int):
