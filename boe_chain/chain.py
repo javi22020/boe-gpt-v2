@@ -19,7 +19,7 @@ class BOEGPTChain:
     def __init__(self, model: str) -> None:
         api_key="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"
         self.llm = ChatOpenAI(
-            base_url="http://127.0.0.1:4550",
+            # base_url="http://127.0.0.1:4550",
             model=model,
             api_key=api_key,
             streaming=True

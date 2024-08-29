@@ -9,6 +9,8 @@ def get_documents_from_pdfs(folder: str):
             if file.endswith(".pdf"):
                 loader = PDFMinerLoader(file_path=os.path.join(root, file))
                 doc = loader.load()[0]
+                if doc.page_content is None:
+                    continue
                 doc.metadata = {
                     "filename": file.replace(".pdf", ""),
                     "date": root.split("/")[-1]

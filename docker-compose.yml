@@ -51,26 +51,26 @@ services:
       chroma:
         condition: service_healthy
   
-  llm:
-    build: ./boe_llm
-    networks:
-      - red
-    ports:
-      - "4550:4550"
-    volumes:
-      - modelo-llm:/app/model
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4550/heartbeat"]
-      interval: 30s
-      timeout: 5s
-      retries: 5
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
+  # llm:
+  #   build: ./boe_llm
+  #   networks:
+  #     - red
+  #   ports:
+  #     - "4550:4550"
+  #   volumes:
+  #     - modelo-llm:/app/model
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:4550/heartbeat"]
+  #     interval: 30s
+  #     timeout: 5s
+  #     retries: 5
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             count: all
+  #             capabilities: [gpu]
   
   chain:
     build: ./boe_chain
@@ -86,8 +86,8 @@ services:
     depends_on:
       docs:
         condition: service_healthy
-      llm:
-        condition: service_healthy
+      # llm:
+      #   condition: service_healthy
   
   frontend:
     build: ./boe_frontend
@@ -103,13 +103,13 @@ networks:
   red:
     driver: bridge
 
-volumes:
-  modelo-llm:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: "./models/llm"
+# volumes:
+#   modelo-llm:
+#     driver: local
+#     driver_opts:
+#       type: none
+#       o: bind
+#       device: "./models/llm"
   
   # modelo-embed:
   #   driver: local

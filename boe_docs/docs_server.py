@@ -13,6 +13,7 @@ pdfsboe = PDFSBOE()
 app = FastAPI()
 chroma = HttpClient(host="127.0.0.1", port=8000)
 logger = logging.getLogger(__name__)
+collection = chroma.get_or_create_collection("docs")
 
 embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
 
@@ -31,7 +32,6 @@ def heartbeat():
 @app.post("/send_to_chroma/{date}")
 async def send_to_chroma(date: str):
     os.makedirs(f"pdfs/{date}", exist_ok=True)
-    collection = chroma.get_or_create_collection("docs")
     if len(os.listdir(f"pdfs/{date}")) == pdfsboe.get_n_pdfs_date(date):
         logger.info("PDFs already downloaded")
     else:
@@ -43,8 +43,9 @@ async def send_to_chroma(date: str):
     logger.info(f"Got {len(docs)} documents")
     docs = divide_documents(docs)
     logger.info(f"Got {len(docs)} documents after division")
-    docs = [d for d in docs if d.page_content is not None]
-    docs_names, docs_contents = [date + "_" + str(i) for i in range(len(docs))], [d.page_content for d in docs]
+    docs = [d for d in docs if d is not None]
+    docs_contents = [d.page_content for d in docs if d.page_content is not None and len(d.page_content) > 0 and d is not None]
+    docs_names = [date + "_" + str(i) for i in range(len(docs_contents))]
     embeds = embeddings.embed_documents(texts=docs_contents)
     collection.add(ids=docs_names, embeddings=embeds)
     return {"message": "Success"}

@@ -17,7 +17,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-chain = BOEGPTChain("default")
+chain = BOEGPTChain("gpt-4o-mini")
 
 @app.post("/chat/{query}")
 async def chat(query: str):
