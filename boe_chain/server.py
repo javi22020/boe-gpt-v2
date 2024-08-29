@@ -5,6 +5,7 @@ import json
 import uvicorn
 from chain import BOEGPTChain
 import asyncio
+import yaml
 
 app = FastAPI()
 
@@ -19,12 +20,14 @@ app.add_middleware(
 chain = BOEGPTChain("default")
 
 @app.post("/chat")
-def chat(query: str = Body(..., embed=True)):
+async def chat(message: dict = Body(...)):
+    query = message.get("message", "")
     r = chain.query(query)
     return JSONResponse(content=r)
 
 @app.post("/chat_stream")
-async def stream_chat(query: str = Body(..., embed=True)):
+async def stream_chat(message: dict = Body(...)):
+    query = message.get("message", "")
     async def event_generator():
         for chunk in chain.query_stream(query):
             yield f"data: {chunk}\n\n"
@@ -39,6 +42,12 @@ def get_conversations():
 @app.get("/heartbeat")
 def heartbeat():
     return {"message": "Alive"}
+
+@app.get("/model")
+def get_current_model():
+    with open("config.yaml", "r", encoding="utf-8") as f:
+        config = yaml.safe_load(f)
+    return {"model_index": config.get("model", 0)}
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=3550)

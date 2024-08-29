@@ -5,10 +5,12 @@ import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Sidebar } from '@/components/ui/sidebar';
 import { Card } from '@/components/ui/card';
-import WelcomePage from '@/app/WelcomePage';
-import { ThemeProvider, useTheme } from '@/context/theme';
+import { useTheme } from '@/context/theme';
+import { ThemeProvider } from '@/context/theme';
+import WelcomePage from './WelcomePage';
 import { AnimatePresence, motion } from 'framer-motion';
 import CalendarComponent from '@/components/CalendarComponent';
+
 const ChatWindow = () => {
   const { darkMode, toggleDarkMode } = useTheme(true);
   const [streamingMode, setStreamingMode] = useState(true);
@@ -20,16 +22,18 @@ const ChatWindow = () => {
   const [inputMessage, setInputMessage] = useState('');
   const [models, setModels] = useState([]);
   const [selectedModel, setSelectedModel] = useState(null);
+  const [selectedModelIndex, setSelectedModelIndex] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {
     fetchConversations();
     fetchModels();
+    fetchCurrentModelIndex();
   }, []);
 
   const fetchConversations = async () => {
     try {
-      const response = await fetch('http://chain:3550/conversations');
+      const response = await fetch('http://127.0.0.1:3550/conversations');
       const data = await response.json();
       setConversations(data);
     } catch (error) {
@@ -39,18 +43,29 @@ const ChatWindow = () => {
 
   const fetchModels = async () => {
     try {
-      const response = await fetch('http://llm:4550/models');
+      const response = await fetch('http://127.0.0.1:4550/models');
       const data = await response.json();
       setModels(data.models);
-      setSelectedModel(data.models[0]);
     } catch (error) {
       console.error('Error fetching models:', error);
     }
   };
 
+  const fetchCurrentModelIndex = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:4550/model');
+      const data = await response.json();
+      setSelectedModelIndex(data.model_index);
+      setSelectedModel(models[data.model_index]);
+    } catch (error) {
+      console.error('Error fetching current model index:', error);
+    }
+  };
+
   const handleModelChange = async (modelIndex) => {
     try {
-      await fetch(`http://llm:4550/set_model/${modelIndex}`, { method: 'POST' });
+      await fetch(`http://127.0.0.1:4550/set_model/${modelIndex}`, { method: 'POST' });
+      setSelectedModelIndex(modelIndex);
       setSelectedModel(models[modelIndex]);
       setIsDropdownOpen(false);
     } catch (error) {
@@ -75,7 +90,7 @@ const ChatWindow = () => {
     setMessages([...messages, newMessage]);
     setInputMessage('');
 
-    const endpoint = streamingMode ? 'http://chain:3550/chat_stream' : 'http://chain:3550/chat';
+    const endpoint = streamingMode ? 'http://127.0.0.1:3550/chat_stream' : 'http://127.0.0.1:3550/chat';
 
     try {
       const response = await fetch(endpoint, {
@@ -85,7 +100,6 @@ const ChatWindow = () => {
       });
 
       if (streamingMode) {
-        // Implementación del streaming (esto es un placeholder)
         const reader = response.body.getReader();
         let assistantMessage = { role: 'assistant', content: '' };
 
@@ -197,7 +211,9 @@ const ChatWindow = () => {
                     {models.map((model, index) => (
                       <div
                         key={index}
-                        className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                        className={`px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer ${
+                          index === selectedModelIndex ? 'bg-blue-100 dark:bg-blue-700' : ''
+                        }`}
                         onClick={() => handleModelChange(index)}
                       >
                         {model}
@@ -209,17 +225,17 @@ const ChatWindow = () => {
             </div>
           </div>
           <div className="mb-4">
-              <div className="flex flex-wrap gap-2">
-                {selectedDays.map((day) => (
-                  <span key={day} className="bg-blue-500 text-white px-2 py-1 rounded-full text-sm">
-                    {day}
-                  </span>
-                ))}
-              </div>
+            <div className="flex flex-wrap gap-2">
+              {selectedDays.map((day) => (
+                <span key={day} className="bg-blue-500 text-white px-2 py-1 rounded-full text-sm">
+                  {day}
+                </span>
+              ))}
             </div>
-            <div className="mt-4">
-              <CalendarComponent onDaySelect={handleDaySelect} />
-            </div>
+          </div>
+          <div className="mt-4">
+            <CalendarComponent onDaySelect={handleDaySelect} />
+          </div>
         </Sidebar>
 
         {/* Toggle buttons for sidebars */}
