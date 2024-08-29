@@ -19,15 +19,13 @@ app.add_middleware(
 
 chain = BOEGPTChain("default")
 
-@app.post("/chat")
-async def chat(message: dict = Body(...)):
-    query = message.get("message", "")
+@app.post("/chat/{query}")
+async def chat(query: str):
     r = chain.query(query)
     return JSONResponse(content=r)
 
-@app.post("/chat_stream")
-async def stream_chat(message: dict = Body(...)):
-    query = message.get("message", "")
+@app.post("/chat_stream/{query}")
+async def stream_chat(query: str):
     async def event_generator():
         for chunk in chain.query_stream(query):
             yield f"data: {chunk}\n\n"

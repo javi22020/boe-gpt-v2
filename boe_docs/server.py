@@ -28,14 +28,10 @@ app.add_middleware(
 def heartbeat():
     return {"message": "Alive"}
 
-@app.get("/collections")
-def get_collections():
-    return JSONResponse([c.name for c in chroma.list_collections()])
-
 @app.post("/send_to_chroma/{date}")
 async def send_to_chroma(date: str):
     os.makedirs(f"pdfs/{date}", exist_ok=True)
-    collection = chroma.get_or_create_collection(date)
+    collection = chroma.get_or_create_collection("docs")
     if len(os.listdir(f"pdfs/{date}")) == pdfsboe.get_n_pdfs_date(date):
         logger.info("PDFs already downloaded")
     else:

@@ -22,7 +22,8 @@ class BOEGPTChain:
         self.llm = ChatOpenAI(
             base_url="http://127.0.0.1:4550",
             model=model,
-            api_key=api_key
+            api_key=api_key,
+            streaming=True
         )
         self.prompt_docs = PromptTemplate.from_template(open("prompt_docs.md", "r", encoding="utf-8").read())
         self.chroma = Chroma(client=HttpClient(host="127.0.0.1", port=8000), collection_name="docs", embedding_function=OpenAIEmbeddings(api_key=api_key))

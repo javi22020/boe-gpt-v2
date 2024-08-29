@@ -90,13 +90,15 @@ const ChatWindow = () => {
     setMessages([...messages, newMessage]);
     setInputMessage('');
 
-    const endpoint = streamingMode ? 'http://127.0.0.1:3550/chat_stream' : 'http://127.0.0.1:3550/chat';
+    const encodedQuery = encodeURIComponent(inputMessage);
+    const endpoint = streamingMode 
+      ? `http://127.0.0.1:3550/chat_stream/${encodedQuery}` 
+      : `http://127.0.0.1:3550/chat/${encodedQuery}`;
 
     try {
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: inputMessage }),
       });
 
       if (streamingMode) {
@@ -106,12 +108,18 @@ const ChatWindow = () => {
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
-          assistantMessage.content += new TextDecoder().decode(value);
-          setMessages(prevMessages => [...prevMessages.slice(0, -1), assistantMessage]);
+          const chunk = new TextDecoder().decode(value);
+          const lines = chunk.split('\n\n');
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              assistantMessage.content += line.slice(6);
+              setMessages(prevMessages => [...prevMessages.slice(0, -1), { ...assistantMessage }]);
+            }
+          }
         }
       } else {
         const data = await response.json();
-        setMessages(prevMessages => [...prevMessages, { role: 'assistant', content: data.response }]);
+        setMessages(prevMessages => [...prevMessages, { role: 'assistant', content: data.answer }]);
       }
     } catch (error) {
       console.error('Error sending message:', error);

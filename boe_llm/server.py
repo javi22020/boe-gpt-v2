@@ -1,7 +1,6 @@
 from llama_cpp.server.app import create_app
 from llama_cpp.server.settings import ModelSettings, ServerSettings
 import uvicorn, os, yaml, logging
-from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 logger = logging.getLogger(__name__)
