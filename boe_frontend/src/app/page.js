@@ -33,7 +33,7 @@ const ChatWindow = () => {
 
   const fetchConversations = async () => {
     try {
-      const response = await fetch('http://chain:3550/conversations');
+      const response = await fetch('http://127.0.0.1:3550/conversations');
       const data = await response.json();
       setConversations(data);
     } catch (error) {
@@ -43,7 +43,7 @@ const ChatWindow = () => {
 
   const fetchModels = async () => {
     try {
-      const response = await fetch('http://llm:4550/models');
+      const response = await fetch('http://127.0.0.1:4550/models');
       const data = await response.json();
       setModels(data.models);
     } catch (error) {
@@ -53,7 +53,7 @@ const ChatWindow = () => {
 
   const fetchCurrentModelIndex = async () => {
     try {
-      const response = await fetch('http://llm:4550/model');
+      const response = await fetch('http://127.0.0.1:4550/model');
       const data = await response.json();
       setSelectedModelIndex(data.model_index);
       setSelectedModel(models[data.model_index]);
@@ -64,7 +64,7 @@ const ChatWindow = () => {
 
   const handleModelChange = async (modelIndex) => {
     try {
-      await fetch(`http://llm:4550/set_model/${modelIndex}`, { method: 'POST' });
+      await fetch(`http://127.0.0.1:4550/set_model/${modelIndex}`, { method: 'POST' });
       setSelectedModelIndex(modelIndex);
       setSelectedModel(models[modelIndex]);
       setIsDropdownOpen(false);
@@ -76,7 +76,7 @@ const ChatWindow = () => {
   const handleDaySelect = async (day) => {
     const formattedDay = day.replace(/-/g, '');
     try {
-      await fetch(`http://docs:6550/send_to_chroma/${formattedDay}`, { method: 'POST' });
+      await fetch(`http://127.0.0.1:6550/send_to_chroma/${formattedDay}`, { method: 'POST' });
       setSelectedDays(prevDays => [...prevDays, day]);
     } catch (error) {
       console.error('Error sending day to Chroma:', error);
@@ -92,8 +92,8 @@ const ChatWindow = () => {
 
     const encodedQuery = encodeURIComponent(inputMessage);
     const endpoint = streamingMode 
-      ? `http://chain:3550/chat_stream/${encodedQuery}` 
-      : `http://chain:3550/chat/${encodedQuery}`;
+      ? `http://127.0.0.1:3550/chat_stream/${encodedQuery}` 
+      : `http://127.0.0.1:3550/chat/${encodedQuery}`;
 
     try {
       const response = await fetch(endpoint, {
