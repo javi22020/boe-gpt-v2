@@ -10,11 +10,13 @@ import { ThemeProvider } from '@/context/theme';
 import WelcomePage from './WelcomePage';
 import { AnimatePresence, motion } from 'framer-motion';
 import CalendarComponent from '@/components/CalendarComponent';
+import ReactMarkdown from 'react-markdown';
 
 const ChatWindow = () => {
   const { darkMode, toggleDarkMode } = useTheme(true);
   const [streamingMode, setStreamingMode] = useState(true);
   const [conversations, setConversations] = useState([]);
+  const [selectedConversation, setSelectedConversation] = useState(0);
   const [selectedDays, setSelectedDays] = useState([]);
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(false);
   const [rightSidebarOpen, setRightSidebarOpen] = useState(false);
@@ -112,14 +114,17 @@ const ChatWindow = () => {
           const lines = chunk.split('\n\n');
           for (const line of lines) {
             if (line.startsWith('data: ')) {
-              assistantMessage.content += line.slice(6);
+              assistantMessage.content += line.slice(6).replace(/\n/g, '\\n') + ' ';
               setMessages(prevMessages => [...prevMessages.slice(0, -1), { ...assistantMessage }]);
             }
           }
         }
       } else {
         const data = await response.json();
-        setMessages(prevMessages => [...prevMessages, { role: 'assistant', content: data.answer }]);
+        setMessages(prevMessages => [...prevMessages, { 
+          role: 'assistant', 
+          content: data.answer ? data.answer.replace(/\n/g, '\\n') : 'No answer received'
+        }]);
       }
     } catch (error) {
       console.error('Error sending message:', error);
@@ -158,7 +163,9 @@ const ChatWindow = () => {
                       ? 'bg-blue-500 text-white' 
                       : 'bg-gray-200 text-gray-900 dark:bg-gray-700 dark:text-white'
                   }`}>
-                    <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                    <ReactMarkdown className="text-sm whitespace-pre-wrap">
+                      {msg.content}
+                    </ReactMarkdown>
                   </div>
                 </div>
               ))}

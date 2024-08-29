@@ -9,10 +9,10 @@ from chromadb import HttpClient
 Chroma._LANGCHAIN_DEFAULT_COLLECTION_NAME = "docs"
 session = {}
 
-def get_history(id: int):
+def get_history(session_id: int):
     if id not in session:
-        session[id] = []
-    return session[id]
+        session[session_id] = []
+    return session[session_id]
 
 class BOEGPTChain:
     def __init__(self, model: str) -> None:
@@ -39,10 +39,10 @@ class BOEGPTChain:
             get_history
         )
     
-    def query(self, query: str) -> str:
-        return self.retrieval_chain.invoke(input={"input": query})["answer"]
+    def query(self, query: str, session_id: int = 1) -> str:
+        return self.chain.invoke(input={"input": query}, config={"configurable": {"session_id": session_id}})["answer"]
     
-    def query_stream(self, query: str):
-        for r in self.retrieval_chain.stream(input={"input": query}):
+    def query_stream(self, query: str, session_id: int = 1):
+        for r in self.chain.stream(input={"input": query}, config={"configurable": {"session_id": session_id}}):
             if isinstance(r, dict) and "answer" in r:
                 yield r["answer"]

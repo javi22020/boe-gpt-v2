@@ -22,7 +22,7 @@ chain = BOEGPTChain("gpt-4o-mini")
 @app.post("/chat/{query}")
 async def chat(query: str):
     r = chain.query(query)
-    return JSONResponse(content=r)
+    return {"answer": r}
 
 @app.post("/chat_stream/{query}")
 async def stream_chat(query: str):
