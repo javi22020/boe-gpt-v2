@@ -10,6 +10,8 @@ FIN DE LOS DOCUMENTOS
 
 Si no aparecen documentos, es posible que no haya ninguno disponible. En ese caso, puedes decirle al usuario que añada documentos en los ajustes.
 
+Si los documentos no son útiles, puedes decirle al usuario que añada documentos más específicos en los ajustes.
+
 Petición del usuario:
 
 {input}

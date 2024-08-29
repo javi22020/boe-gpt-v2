@@ -16,7 +16,7 @@ app = FastAPI()
 chroma_client = HttpClient(host="chroma", port=8000)
 logger = logging.getLogger(__name__)
 
-embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+embeddings = OpenAIEmbeddings(model="text-embedding-3-small", api_key="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")
 
 chroma = Chroma(collection_name="docs", client=chroma_client, embedding_function=embeddings)
 
