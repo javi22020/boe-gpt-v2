@@ -13,26 +13,26 @@ services:
       timeout: 5s
       retries: 5
   
-  embed:
-    build: ./boe_embed
-    networks:
-      - red
-    ports:
-      - "5550:5550"
-    volumes:
-      - modelo-embed:/app/model
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5550/heartbeat"]
-      interval: 30s
-      timeout: 5s
-      retries: 5
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
+  # embed:
+  #   build: ./boe_embed
+  #   networks:
+  #     - red
+  #   ports:
+  #     - "5550:5550"
+  #   volumes:
+  #     - modelo-embed:/app/model
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:5550/heartbeat"]
+  #     interval: 30s
+  #     timeout: 5s
+  #     retries: 5
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             count: all
+  #             capabilities: [gpu]
   
   docs:
     build: ./boe_docs
