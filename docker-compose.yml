@@ -9,9 +9,9 @@ services:
       - "8000:8000"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
-      interval: 60s
+      interval: 10s
       timeout: 5s
-      retries: 10
+      retries: 100
   
   # embed:
   #   build: ./boe_embed
@@ -42,9 +42,9 @@ services:
       - "6550:6550"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:6550/heartbeat"]
-      interval: 60s
+      interval: 10s
       timeout: 5s
-      retries: 10
+      retries: 100
     depends_on:
       # embed:
       #   condition: service_healthy
@@ -61,7 +61,7 @@ services:
   #     - modelo-llm:/app/model
   #   healthcheck:
   #     test: ["CMD", "curl", "-f", "http://localhost:4550/heartbeat"]
-  #     interval: 60s
+  #     interval: 10s
   #     timeout: 5s
   #     retries: 10
   #   deploy:
@@ -80,12 +80,14 @@ services:
       - "3550:3550"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3550/heartbeat"]
-      interval: 60s
+      interval: 10s
       timeout: 5s
-      retries: 10
+      retries: 100
     depends_on:
-      docs:
+      chroma:
         condition: service_healthy
+      # docs:
+      #   condition: service_healthy
       # llm:
       #   condition: service_healthy
   
