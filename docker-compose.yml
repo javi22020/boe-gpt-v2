@@ -46,8 +46,8 @@ services:
       timeout: 5s
       retries: 5
     depends_on:
-      embed:
-        condition: service_healthy
+      # embed:
+      #   condition: service_healthy
       chroma:
         condition: service_healthy
   
@@ -111,9 +111,9 @@ volumes:
       o: bind
       device: "./models/llm"
   
-  modelo-embed:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: "./models/embed"
+  # modelo-embed:
+  #   driver: local
+  #   driver_opts:
+  #     type: none
+  #     o: bind
+  #     device: "./models/embed"

@@ -20,7 +20,7 @@ export default function Component() {
       const formattedDate = format(date, "yyyyMMdd")
       try {
         setLoading(true)
-        await axios.post(`http://127.0.0.1:6550/send_to_chroma/${formattedDate}`)
+        await axios.post(`http://docs:6550/send_to_chroma/${formattedDate}`)
         alert("Fecha enviada con éxito")
       } catch (error) {
         console.error("Error al enviar la fecha:", error)

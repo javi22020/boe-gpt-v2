@@ -29,7 +29,7 @@ async def stream_chat(query: str):
     async def event_generator():
         for chunk in chain.query_stream(query):
             yield f"data: {chunk}\n\n"
-            await asyncio.sleep(0)  # Allow other tasks to run
+            await asyncio.sleep(0)
     
     return StreamingResponse(event_generator(), media_type="text/event-stream")
 
