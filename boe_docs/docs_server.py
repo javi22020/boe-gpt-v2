@@ -51,4 +51,4 @@ async def send_to_chroma(date: str):
     return {"message": "Success"}
 
 if __name__ == "__main__":
-    uvicorn.run("docs_server:app", host="0.0.0.0", port=6550, reload=True)
+    uvicorn.run(app, host="0.0.0.0", port=6550)
