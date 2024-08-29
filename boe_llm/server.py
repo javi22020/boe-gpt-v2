@@ -54,5 +54,5 @@ def set_model(i: int):
         return {"message": "Invalid model index"}, 400
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=4550)
+    uvicorn.run("server:app", host="0.0.0.0", port=4550, reload=True)
     logger.info("Server started")

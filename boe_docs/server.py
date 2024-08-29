@@ -1,5 +1,5 @@
 from chromadb.api.types import Embeddings, Documents
-import os, openai, uvicorn, logging
+import os, uvicorn, logging
 from tqdm import tqdm
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse

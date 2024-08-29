@@ -1,4 +1,3 @@
-import openai
 from langchain_openai.chat_models.base import ChatOpenAI
 from langchain.chains.retrieval import create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
@@ -6,7 +5,7 @@ from langchain.prompts.prompt import PromptTemplate
 from langchain_chroma.vectorstores import Chroma
 from langchain_openai.embeddings.base import OpenAIEmbeddings
 from langchain_core.runnables.history import RunnableWithMessageHistory
-from chromadb import HttpClient, EmbeddingFunction
+from chromadb import HttpClient
 
 from chromadb.api.types import Embeddings, Documents
 

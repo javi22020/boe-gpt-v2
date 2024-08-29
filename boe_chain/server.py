@@ -44,4 +44,4 @@ def heartbeat():
     return {"message": "Alive"}
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=3550)
+    uvicorn.run("server:app", host="0.0.0.0", port=3550, reload=True)
