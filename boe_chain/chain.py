@@ -6,8 +6,7 @@ from langchain_chroma.vectorstores import Chroma
 from langchain_openai.embeddings.base import OpenAIEmbeddings
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from chromadb import HttpClient
-from chromadb.api.types import Embeddings, Documents
-
+Chroma._LANGCHAIN_DEFAULT_COLLECTION_NAME = "docs"
 session = {}
 
 def get_history(id: int):
@@ -26,6 +25,7 @@ class BOEGPTChain:
         )
         self.prompt_docs = PromptTemplate.from_template(open("prompt_docs.md", "r", encoding="utf-8").read())
         self.chroma = Chroma(client=HttpClient(host="127.0.0.1", port=8000), collection_name="docs", embedding_function=OpenAIEmbeddings(api_key=api_key))
+        self.chroma._LANGCHAIN_DEFAULT_COLLECTION_NAME = "docs"
         self.doc_chain = create_stuff_documents_chain(
             llm=self.llm,
             prompt=self.prompt_docs

@@ -7,15 +7,18 @@ from fastapi.middleware.cors import CORSMiddleware
 from pdfsboe.api import PDFSBOE
 from pdfsboe.divide import get_documents_from_pdfs, divide_documents
 from langchain_openai.embeddings.base import OpenAIEmbeddings
-from chromadb import HttpClient, EmbeddingFunction
+from langchain_chroma.vectorstores import Chroma
+Chroma._LANGCHAIN_DEFAULT_COLLECTION_NAME = "docs"
+from chromadb import HttpClient
 os.makedirs("pdfs", exist_ok=True)
 pdfsboe = PDFSBOE()
 app = FastAPI()
-chroma = HttpClient(host="127.0.0.1", port=8000)
+chroma_client = HttpClient(host="127.0.0.1", port=8000)
 logger = logging.getLogger(__name__)
-collection = chroma.get_or_create_collection("docs")
 
 embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+
+chroma = Chroma(collection_name="docs", client=chroma_client, embedding_function=embeddings)
 
 app.add_middleware(
     CORSMiddleware,
@@ -43,11 +46,8 @@ async def send_to_chroma(date: str):
     logger.info(f"Got {len(docs)} documents")
     docs = divide_documents(docs)
     logger.info(f"Got {len(docs)} documents after division")
-    docs = [d for d in docs if d is not None]
-    docs_contents = [d.page_content for d in docs if d.page_content is not None and len(d.page_content) > 0 and d is not None]
-    docs_names = [date + "_" + str(i) for i in range(len(docs_contents))]
-    embeds = embeddings.embed_documents(texts=docs_contents)
-    collection.add(ids=docs_names, embeddings=embeds)
+    docs = [d for d in docs if d is not None and d.page_content is not None]
+    chroma.add_documents(documents=docs)
     return {"message": "Success"}
 
 if __name__ == "__main__":
