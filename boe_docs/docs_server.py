@@ -13,7 +13,7 @@ from chromadb import HttpClient
 os.makedirs("pdfs", exist_ok=True)
 pdfsboe = PDFSBOE()
 app = FastAPI()
-chroma_client = HttpClient(host="127.0.0.1", port=8000)
+chroma_client = HttpClient(host="chroma", port=8000)
 logger = logging.getLogger(__name__)
 
 embeddings = OpenAIEmbeddings(model="text-embedding-3-small")

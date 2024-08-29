@@ -15,7 +15,7 @@ app = create_app(
     model_settings=[
         ModelSettings(
             model="model/" + os.listdir("model")[config["model"]],
-            model_alias="default",
+            model_alias="gpt-4o-mini",
             n_gpu_layers=-1
         )
     ]
