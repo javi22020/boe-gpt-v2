@@ -43,7 +43,7 @@ const ChatWindow = () => {
 
   const fetchModels = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:4550/models');
+      const response = await fetch('http://127.0.0.1:4550/downloaded_models');
       const data = await response.json();
       setModels(data.models);
     } catch (error) {
@@ -53,7 +53,7 @@ const ChatWindow = () => {
 
   const fetchCurrentModelIndex = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:4550/model');
+      const response = await fetch('http://127.0.0.1:4550/selected_model');
       const data = await response.json();
       setSelectedModelIndex(data.model_index);
       setSelectedModel(models[data.model_index]);

@@ -12,4 +12,4 @@ RUN . venv/bin/activate && \
 
 EXPOSE 6550:6550
 
-CMD . venv/bin/activate && python3 server.py
+CMD . venv/bin/activate && python3 docs_server.py

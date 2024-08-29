@@ -12,4 +12,4 @@ RUN . venv/bin/activate && \
 
 EXPOSE 3550:3550
 
-CMD . venv/bin/activate && python3 server.py
+CMD . venv/bin/activate && python3 chain_server.py

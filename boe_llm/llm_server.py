@@ -34,11 +34,11 @@ app.add_middleware(
 def heartbeat():
     return {"message": "Alive"}
 
-@app.get("/models")
+@app.get("/downloaded_models")
 def get_models():
     return {"models": models}
 
-@app.get("/model")
+@app.get("/selected_model")
 def get_model():
     return {"model_index": config["model"]}
 
@@ -53,5 +53,5 @@ def set_model(i: int):
         return {"message": "Invalid model index"}, 400
 
 if __name__ == "__main__":
-    uvicorn.run("server:app", host="0.0.0.0", port=4550, reload=True)
+    uvicorn.run("llm_server:app", host="0.0.0.0", port=4550, reload=True)
     logger.info("Server started")

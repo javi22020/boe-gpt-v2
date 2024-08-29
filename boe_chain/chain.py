@@ -6,7 +6,6 @@ from langchain_chroma.vectorstores import Chroma
 from langchain_openai.embeddings.base import OpenAIEmbeddings
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from chromadb import HttpClient
-
 from chromadb.api.types import Embeddings, Documents
 
 session = {}
