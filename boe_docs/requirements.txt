@@ -5,6 +5,7 @@ pydantic
 fastapi
 uvicorn[standard]
 pdfminer.six
+langchain-openai
 langchain-community
 langchain-text-splitters
 chromadb

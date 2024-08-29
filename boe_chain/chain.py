@@ -4,9 +4,11 @@ from langchain.chains.retrieval import create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.prompts.prompt import PromptTemplate
 from langchain_chroma.vectorstores import Chroma
-from langchain_openai.embeddings.base import OpenAIEmbeddings
+from langchain_community.embeddings.localai import LocalAIEmbeddings
 from langchain_core.runnables.history import RunnableWithMessageHistory
-from chromadb import HttpClient
+from chromadb import HttpClient, EmbeddingFunction
+
+from chromadb.api.types import Embeddings, Documents
 
 session = {}
 
@@ -15,6 +17,16 @@ def get_history(id: int):
         session[id] = []
     return session[id]
 
+class OpenAIEmbeddings(EmbeddingFunction):
+    def __init__(self) -> None:
+        super().__init__()
+        self.embed = openai.OpenAI(
+            # base_url="http://127.0.0.1:5550",
+            api_key="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"
+        )
+
+    def __call__(self, input: Documents) -> Embeddings:
+        return self.embed.embeddings.create(input=input, model="text-embedding-3-small").data[0].embedding
 
 class BOEGPTChain:
     def __init__(self, model: str) -> None:

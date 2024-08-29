@@ -9,7 +9,7 @@ app = create_app(
     model_settings=[
         ModelSettings(
             model="model/" + os.listdir("model")[0],
-            model_alias="default-embed",
+            model_alias="text-embedding-3-large",
             n_gpu_layers=-1,
             embedding=True
         )
