@@ -1,2 +1,5 @@
 fastapi
 uvicorn[standard]
+sse-starlette
+starlette-context
+pydantic-settings

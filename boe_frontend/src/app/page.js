@@ -61,7 +61,7 @@ const ChatWindow = () => {
   const handleDaySelect = async (day) => {
     const formattedDay = day.replace(/-/g, '');
     try {
-      await fetch(`http://docs:6550/send_to_chroma/${formattedDay}`, { method: 'POST' });
+      await fetch(`http://127.0.0.1:6550/send_to_chroma/${formattedDay}`, { method: 'POST' });
       setSelectedDays(prevDays => [...prevDays, day]);
     } catch (error) {
       console.error('Error sending day to Chroma:', error);

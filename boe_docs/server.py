@@ -1,6 +1,7 @@
 from chromadb.api.types import Embeddings, Documents
-import os, openai, uvicorn
+import os, openai, uvicorn, logging
 from tqdm import tqdm
+from langchain_openai.embeddings.base import OpenAIEmbeddings
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,17 +11,22 @@ from chromadb import HttpClient, EmbeddingFunction
 os.makedirs("pdfs", exist_ok=True)
 pdfsboe = PDFSBOE()
 app = FastAPI()
-chroma = HttpClient(host="chroma", port=8000)
+chroma = HttpClient(host="127.0.0.1", port=8000)
 
 class LocalEmbeddings(EmbeddingFunction):
     def __init__(self) -> None:
         super().__init__()
-        self.embed = openai.OpenAI(
-            base_url="http://embed:5550",
+        self.embed_client = openai.OpenAI(
+            base_url="http://127.0.0.1:5550",
             api_key="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"
         )
+        self.embed = OpenAIEmbeddings(client=self.embed_client)
     def __call__(self, input: Documents) -> Embeddings:
-        return self.embed.embeddings.create(input, model="default-embed").data[0].embedding
+        emb = self.embed.embed_documents(texts=input)
+        embs = []
+        for e in emb:
+            embs.extend(e)
+        return embs
 
 embeddings = LocalEmbeddings()
 
@@ -40,7 +46,7 @@ def heartbeat():
 def get_collections():
     return JSONResponse([c.name for c in chroma.list_collections()])
 
-@app.post("/send_to_chroma")
+@app.post("/send_to_chroma/{date}")
 async def send_to_chroma(date: str):
     os.makedirs(f"pdfs/{date}", exist_ok=True)
     collection = chroma.get_or_create_collection(date)

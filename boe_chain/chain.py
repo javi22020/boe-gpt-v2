@@ -7,20 +7,29 @@ from langchain_chroma.vectorstores import Chroma
 from langchain_openai.embeddings.base import OpenAIEmbeddings
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from chromadb import HttpClient
+
+session = {}
+
+def get_history(id: int):
+    if id not in session:
+        session[id] = []
+    return session[id]
+
+
 class BOEGPTChain:
     def __init__(self, model: str) -> None:
         api_key="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"
         self.llm = ChatOpenAI(
-            base_url="http://llm:4550",
+            base_url="http://127.0.0.1:4550",
             model=model,
             api_key=api_key
         )
         embed_client = openai.OpenAI(
-            base_url="http://embed:5550",
+            base_url="http://127.0.0.1:5550",
             api_key=api_key
         )
         self.prompt_docs = PromptTemplate.from_template(open("prompt_docs.md", "r", encoding="utf-8").read())
-        self.chroma = Chroma(client=HttpClient(host="chroma", port=8000), collection_name="docs", embedding_function=OpenAIEmbeddings(client=embed_client))
+        self.chroma = Chroma(client=HttpClient(host="127.0.0.1", port=8000), collection_name="docs", embedding_function=OpenAIEmbeddings(client=embed_client))
         self.doc_chain = create_stuff_documents_chain(
             llm=self.llm,
             prompt=self.prompt_docs
@@ -29,14 +38,11 @@ class BOEGPTChain:
             retriever=self.chroma.as_retriever(),
             combine_docs_chain=self.doc_chain
         )
-        self.chain = RunnableWithMessageHistory(
-            self.retrieval_chain
-        )
     
     def query(self, query: str) -> str:
-        return self.chain.invoke(input={"input": query})["answer"]
+        return self.retrieval_chain.invoke(input={"input": query})["answer"]
     
     def query_stream(self, query: str):
-        for r in self.chain.stream(input={"input": query}):
+        for r in self.retrieval_chain.stream(input={"input": query}):
             if isinstance(r, dict) and "answer" in r:
                 yield r["answer"]
